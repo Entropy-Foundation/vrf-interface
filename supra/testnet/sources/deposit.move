@@ -1,7 +1,25 @@
 module supra_addr::deposit {
 
+
+    use std::string::String;
+
     /// Capability struct for VRF module permissions
     struct SupraVRFPermit<phantom T> has store {}
+
+    /// Client's module balance information return struct
+    struct ClientModuleInfo has drop, copy {
+        module_type_info: String,
+        max_callback_txn_fee: u64,
+        min_balance_limit: u64,
+        balance: u64,
+        enabled: bool,
+        current_grant: u64
+    }
+
+    /// Whitelist a client address with specified configuration
+    /// - max_txn_fee: Maximum transaction fee allowed for the client
+    /// Automatically grants default supra amount to new clients
+    native public entry fun whitelist_client_address(client: &signer,max_txn_fee: u64);
 
     /// Initialize VRF module for a client
     /// Returns a SupraVRFPermit capability that represents module authorization
@@ -32,4 +50,29 @@ module supra_addr::deposit {
 
     /// Client withdrawing deposit Supra coin
     native public entry fun withdraw_fund(sender: &signer, withdraw_amount: u64);
-}
+
+    #[view]
+    /// Check if client is whitelisted (V2)
+    native public fun is_client_whitelisted_v2(client_address: address): bool;
+
+    #[view]
+    /// Get client's current balance
+    native public fun check_client_fund(client_address: address): u64;
+
+    #[view]
+    /// Get client's minimum balance requirement (V2)
+    native public fun check_min_balance_client_v2(client_address: address): u64;
+
+    #[view]
+    /// Get client's maximum transaction fee (V2)
+    native public fun check_max_txn_fee_client_v2(client_address: address): u64;
+
+    #[view]
+    /// Get client's remaining grant amount
+    native public fun get_client_remaining_grant(client_address: address): u64;
+
+    #[view]
+    /// Get information for all modules whitelisted by a client
+    /// Returns a vector of ClientModuleInfo structs
+    native public fun get_client_modules_info(client_address: address): vector<ClientModuleInfo>;
+    }
