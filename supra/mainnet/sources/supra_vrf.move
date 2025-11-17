@@ -1,10 +1,9 @@
 module supra_addr::supra_vrf {
     use std::string::String;
+    use supra_addr::deposit::{Self, SupraVRFPermit};
 
-    native public fun rng_request(
-        _sender: &signer, // caller signer
-        _callback_address: address, // callback address
-        _callback_module: String, // callback module name
+    native public fun rng_request_v2<T>(
+        _permit_cap: &SupraVRFPermit<T>, // permit that can be obtain from init_module
         _callback_function: String, // callback function name
         _rng_count: u8, // how many random number you wants to generate
         _client_seed: u64, // using as seed to generate random. defualt pass "0", if you don't want to use
